@@ -7,54 +7,70 @@ signal data
 signal disconnected
 signal error
 
-# Our WebSocketClient instance
-var _client = WebSocketClient.new()
+# WebSocketClient instance
+var _client = WebSocketPeer.new()
 
 
 func _ready():
-	_client.connect("connection_closed", self, "_closed")
-	_client.connect("connection_error", self, "_closed")
-	_client.connect("connection_established", self, "_connected")
-	_client.connect("data_received", self, "_on_data")
+	# Connect signals with clear and descriptive names
+	_client.connect("connection_established",Callable( self, "_on_connected"))
+	_client.connect("data_received", Callable( self, "_on_data_received"))
+	_client.connect("connection_closed", Callable( self, "_on_connection_closed"))
+	_client.connect("connection_error", Callable( self, "_on_connection_error"))
 
 
 func connect_to_server(hostname: String, port: int) -> void:
-	# Connects to the server or emits an error signal.
-	# If connected, emits a connect signal.
-	var websocket_url = "ws://%s:%d" % [hostname, port]
+	# Build a well-formatted WebSocket URL
+	var websocket_url = "ws://" + hostname + ":" + str(port)  # Use str() for string conversion
+
+	# Attempt connection and handle errors gracefully
 	var err = _client.connect_to_url(websocket_url)
-	if err:
-		print("Unable to connect")
+	if err != OK:
+		print("Error connecting:", err)
 		set_process(false)
-		emit_signal("error")
+		emit_signal("error", err)
 
 
 func send_packet(packet: Packet) -> void:
-	# Sends a packet to the server
-	_send_string(packet.tostring())
+	# Convert packet to a UTF-8 buffer and handle potential errors
+	var packet_buffer = packet.tostring().to_utf8_buffer()
+	if not packet_buffer:
+		print("Error creating packet buffer")
+		return  # Early return to avoid sending empty data
+
+	_client.get_peer(1).put_packet(packet_buffer)
+	print("Sent packet:", packet.tostring())
 
 
-func _closed(was_clean = false):
-	print("Closed, clean: ", was_clean)
+func _on_connected(proto = ""):
+	print("Connected with protocol:", proto)
+	emit_signal("connected")
+
+
+func _on_data_received():
+	# Retrieve data safely and handle potential errors
+	var data = _client.get_peer(1).get_packet()
+	if not data:
+		print("Error getting data from server")
+		return  # Early return to avoid potential issues
+
+	var string_data = data.get_string_from_utf8()
+	print("Got data from server:", string_data)
+	emit_signal("data", string_data)
+
+
+func _on_connection_closed(was_clean = false):
+	print("Closed, clean:", was_clean)
 	set_process(false)
 	emit_signal("disconnected", was_clean)
 
 
-func _connected(proto = ""):
-	print("Connected with protocol: ", proto)
-	emit_signal("connected")
-
-
-func _on_data():
-	var data: String = _client.get_peer(1).get_packet().get_string_from_utf8()
-	print("Got data from server: ", data)
-	emit_signal("data", data)
+func _on_connection_error(error_code):
+	# Handle connection errors with informative message
+	print("Connection error:", error_code)
+	set_process(false)
+	emit_signal("error", error_code)  # Pass the error code for handling
 
 
 func _process(delta):
 	_client.poll()
-
-
-func _send_string(string: String) -> void:
-	_client.get_peer(1).put_packet(string.to_utf8())
-	print("Sent string ", string)

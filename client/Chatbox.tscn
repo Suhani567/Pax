@@ -1,0 +1,44 @@
+[gd_scene load_steps=2 format=3 uid="uid://ddqmpovjmo67b"]
+
+[ext_resource type="Script" path="res://Chatbox.gd" id="1_yqbi6"]
+
+[node name="Chatbox" type="Node2D"]
+script = ExtResource("1_yqbi6")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
+anchors_preset = -1
+anchor_top = 0.67
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="RichTextLabel" type="RichTextLabel" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "wht
+aso
+hellp
+pick
+up 
+the 
+bacg
+wht
+
+"
+fit_content = true
+scroll_following = true
+autowrap_mode = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "heello
+"
+
+[node name="LineEdit" type="LineEdit" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3

@@ -11,7 +11,11 @@ class GameServerProtocol(WebSocketServerProtocol):
         self._state = self.PLAY
 
     def PLAY(self, sender: 'GameServerProtocol', p: packet.Packet):
-        pass
+       if p.action == packet.Action.Chat:
+         if sender == self:
+            self.broadcast(p, exclude_self=True)
+         else:
+            self.send_client(p)
 
     def tick(self):
         # Process the next packet in the queue

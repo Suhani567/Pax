@@ -1,5 +1,7 @@
 import queue
-import packet
+import utils
+import time
+from server import packet
 from server import models
 from autobahn.twisted.websocket import WebSocketServerProtocol
 
@@ -9,21 +11,32 @@ class GameServerProtocol(WebSocketServerProtocol):
         super().__init__()
         self._packet_queue: queue.Queue[tuple['GameServerProtocol', packet.Packet]] = queue.Queue()
         self._state: callable = self.LOGIN
-        self._user: models.User = None
-
+        self._actor: models.Actor = None
+        # self._player_target: list[float] = None
+        self._player_target: list = None
+        
     def PLAY(self, sender: 'GameServerProtocol', p: packet.Packet):
         if p.action == packet.Action.Chat:
             if sender == self:
                 self.broadcast(p, exclude_self=True)
             else:
                 self.send_client(p)
+                
+        elif p.action == packet.Action.ModelData:
+            self.send_client(p)
+
+        elif p.action == packet.Action.Target:
+            self._player_target = p.payloads
     
     def LOGIN(self, sender: 'GameServerProtocol', p: packet.Packet):
         if p.action == packet.Action.Login:
             username, password = p.payloads
             if models.User.objects.filter(username=username, password=password).exists():
-                self._user = models.User.objects.get(username=username)
+                user = models.User.objects.get(username=username)
+                self._actor = models.Actor.objects.get(user=user)
+
                 self.send_client(packet.OkPacket())
+                self.send_client(packet.ModelDataPacket(models.create_dict(self._actor)))
                 self._state = self.PLAY
             else:
                 self.send_client(packet.DenyPacket("Username or password incorrect"))
@@ -35,8 +48,40 @@ class GameServerProtocol(WebSocketServerProtocol):
             else:
                 user = models.User(username=username, password=password)
                 user.save()
+                player_entity = models.Entity(name=username)
+                player_entity.save()
+                player_ientity = models.InstancedEntity(entity=player_entity, x=0, y=0)
+                player_ientity.save()
+                player = models.Actor(instanced_entity=player_ientity, user=user)
+                player.save()
                 self.send_client(packet.OkPacket())
 
+    def _update_position(self) -> bool:
+        "Attempt to update the actor's position and return true only if the position was changed"
+        if not self._player_target:
+            return False
+        pos = [self._actor.instanced_entity.x, self._actor.instanced_entity.y]
+
+        now: float = time.time()
+        delta_time: float = 1 / self.factory.tickrate
+        if self._last_delta_time_checked:
+            delta_time = now - self._last_delta_time_checked
+        self._last_delta_time_checked = now
+
+        # Use delta time to calculate distance to travel this time
+        dist: float = 70 * delta_time
+        
+        # Early exit if we are already within an acceptable distance of the target
+        if math.dist(pos, self._player_target) < dist:
+            return False
+        
+        # Update our model if we're not already close enough to the target
+        d_x, d_y = utils.direction_to(pos, self._player_target)
+        self._actor.instanced_entity.x += d_x * dist
+        self._actor.instanced_entity.y += d_y * dist
+
+        return True
+    
     def tick(self):
         # Process the next packet in the queue
         if not self._packet_queue.empty():

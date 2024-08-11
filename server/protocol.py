@@ -1,5 +1,6 @@
 import queue
 import packet
+from server import models
 from autobahn.twisted.websocket import WebSocketServerProtocol
 
 
@@ -7,15 +8,34 @@ class GameServerProtocol(WebSocketServerProtocol):
     def __init__(self):
         super().__init__()
         self._packet_queue: queue.Queue[tuple['GameServerProtocol', packet.Packet]] = queue.Queue()
-        self._state: callable = None
-        self._state = self.PLAY
+        self._state: callable = self.LOGIN
+        self._user: models.User = None
 
     def PLAY(self, sender: 'GameServerProtocol', p: packet.Packet):
-       if p.action == packet.Action.Chat:
-         if sender == self:
-            self.broadcast(p, exclude_self=True)
-         else:
-            self.send_client(p)
+        if p.action == packet.Action.Chat:
+            if sender == self:
+                self.broadcast(p, exclude_self=True)
+            else:
+                self.send_client(p)
+    
+    def LOGIN(self, sender: 'GameServerProtocol', p: packet.Packet):
+        if p.action == packet.Action.Login:
+            username, password = p.payloads
+            if models.User.objects.filter(username=username, password=password).exists():
+                self._user = models.User.objects.get(username=username)
+                self.send_client(packet.OkPacket())
+                self._state = self.PLAY
+            else:
+                self.send_client(packet.DenyPacket("Username or password incorrect"))
+
+        elif p.action == packet.Action.Register:
+            username, password = p.payloads
+            if models.User.objects.filter(username=username).exists():
+                self.send_client(packet.DenyPacket("This username is already taken"))
+            else:
+                user = models.User(username=username, password=password)
+                user.save()
+                self.send_client(packet.OkPacket())
 
     def tick(self):
         # Process the next packet in the queue

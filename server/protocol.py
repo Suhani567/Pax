@@ -5,6 +5,7 @@ import math
 from server import packet
 from server import models
 from autobahn.twisted.websocket import WebSocketServerProtocol
+from autobahn.exception import Disconnected
 
 
 class GameServerProtocol(WebSocketServerProtocol):
@@ -96,6 +97,13 @@ class GameServerProtocol(WebSocketServerProtocol):
             s, p = self._packet_queue.get()
             self._state(s, p)
 
+        # To do when there are no packets to process
+        elif self._state == self.PLAY: 
+           actor_dict_before: dict = models.create_dict(self._actor)
+           if self._update_position():
+              actor_dict_after: dict = models.create_dict(self._actor)
+              self.broadcast(packet.ModelDeltaPacket(models.get_delta_dict(actor_dict_before, actor_dict_after)))  
+
     def broadcast(self, p: packet.Packet, exclude_self: bool = False):
         for other in self.factory.players:
             if other == self and exclude_self:
@@ -134,4 +142,7 @@ class GameServerProtocol(WebSocketServerProtocol):
 
     def send_client(self, p: packet.Packet):
         b = bytes(p)
-        self.sendMessage(b)
+        try:
+           self.sendMessage(b)
+        except Disconnected:
+           print(f"Couldn't send {p} because client disconnected.")

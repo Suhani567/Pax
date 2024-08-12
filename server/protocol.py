@@ -25,11 +25,11 @@ class GameServerProtocol(WebSocketServerProtocol):
             else:
                 self.send_client(p)
                 
-        elif p.action == packet.Action.ModelData:
+        elif p.action == packet.Action.ModelDelta:
             self.send_client(p)
 
             if sender not in self._known_others:
-               sender.onPacket(self, packet.ModelDataPacket(models.create_dict(self._actor)))
+               sender.onPacket(self, packet.ModelDeltaPacket(models.create_dict(self._actor)))
                self._known_others.add(sender)
 
         elif p.action == packet.Action.Target:
@@ -43,7 +43,7 @@ class GameServerProtocol(WebSocketServerProtocol):
                 self._actor = models.Actor.objects.get(user=user)
 
                 self.send_client(packet.OkPacket())
-                self.broadcast(packet.ModelDataPacket(models.create_dict(self._actor)))
+                self.broadcast(packet.ModelDeltaPacket(models.create_dict(self._actor)))
                 
                 self._state = self.PLAY
             else:

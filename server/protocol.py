@@ -1,6 +1,7 @@
 import queue
 import utils
 import time
+import math
 from server import packet
 from server import models
 from autobahn.twisted.websocket import WebSocketServerProtocol
@@ -14,6 +15,7 @@ class GameServerProtocol(WebSocketServerProtocol):
         self._actor: models.Actor = None
         # self._player_target: list[float] = None
         self._player_target: list = None
+        self._known_others: set['GameServerProtocol'] = set()
         
     def PLAY(self, sender: 'GameServerProtocol', p: packet.Packet):
         if p.action == packet.Action.Chat:
@@ -24,6 +26,10 @@ class GameServerProtocol(WebSocketServerProtocol):
                 
         elif p.action == packet.Action.ModelData:
             self.send_client(p)
+
+            if sender not in self._known_others:
+               sender.onPacket(self, packet.ModelDataPacket(models.create_dict(self._actor)))
+               self._known_others.add(sender)
 
         elif p.action == packet.Action.Target:
             self._player_target = p.payloads
@@ -36,7 +42,8 @@ class GameServerProtocol(WebSocketServerProtocol):
                 self._actor = models.Actor.objects.get(user=user)
 
                 self.send_client(packet.OkPacket())
-                self.send_client(packet.ModelDataPacket(models.create_dict(self._actor)))
+                self.broadcast(packet.ModelDataPacket(models.create_dict(self._actor)))
+                
                 self._state = self.PLAY
             else:
                 self.send_client(packet.DenyPacket("Username or password incorrect"))
@@ -79,6 +86,7 @@ class GameServerProtocol(WebSocketServerProtocol):
         d_x, d_y = utils.direction_to(pos, self._player_target)
         self._actor.instanced_entity.x += d_x * dist
         self._actor.instanced_entity.y += d_y * dist
+        self._actor.instanced_entity.save()
 
         return True
     
@@ -104,6 +112,8 @@ class GameServerProtocol(WebSocketServerProtocol):
 
     # Override
     def onClose(self, wasClean, code, reason):
+        if self._actor:
+            self._actor.save()
         self.factory.players.remove(self)
         print(f"Websocket connection closed{' unexpectedly' if not wasClean else ' cleanly'} with code {code}: {reason}")
 

@@ -11,13 +11,25 @@ var velocity: Vector2 = Vector2.ZERO
 var is_player: bool = false
 var _player_target: Vector2
 
+var inizialised_position: bool = false
+
 var speed: float = 70.0
+
+func _ready():
+	update(initial_data)
 
 func update(new_model: Dictionary):
 	.update(new_model)
 	
 	var ientity = new_model["instanced_entity"]
 	server_position = Vector2(float(ientity["x"]), float(ientity["y"]))
+	
+	if not initialised_position:
+	initialised_position = true
+	body.position = server_position
+	if is_player:
+		_player_target = server_position
+		
 	actor_name = ientity["entity"]["name"]
 	
 	if label:

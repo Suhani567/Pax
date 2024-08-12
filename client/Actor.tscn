@@ -9,10 +9,14 @@ script = ExtResource( 2 )
 [node name="KinematicBody2D" type="KinematicBody2D" parent="."]
 
 [node name="Label" type="Label" parent="KinematicBody2D"]
-margin_left = -32.0
-margin_top = 36.0
-margin_right = 32.0
-margin_bottom = 50.0
+margin_left = -53.0
+margin_top = 46.0
+margin_right = 53.0
+margin_bottom = 60.0
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="Sprite" type="Sprite" parent="KinematicBody2D"]
 texture = ExtResource( 1 )

@@ -5,13 +5,12 @@ onready var label: Label = get_node("KinematicBody2D/Label")
 onready var sprite: Sprite = get_node("KinematicBody2D/Sprite")
 
 var server_position: Vector2
+var initialised_position: bool = false
 var actor_name: String
 var velocity: Vector2 = Vector2.ZERO
 
 var is_player: bool = false
 var _player_target: Vector2
-
-var initialised_position: bool = false
 
 var rubber_band_radius: float = 200
 
@@ -37,6 +36,7 @@ func update(new_model: Dictionary):
 			elif (body.position - server_position).length() > rubber_band_radius:
 				# Rubber band if body position too far away from server position
 				body.position = server_position
+				
 			
 		if ientity.has("entity"):
 			var entity = ientity["entity"]
@@ -46,16 +46,14 @@ func update(new_model: Dictionary):
 				if label:
 					label.text = actor_name
 
-func _physics_process(delta):
-	if not body:
-		return
-		
+func _physics_process(delta):	
 	var target: Vector2
 	if is_player:
 		target = _player_target
-	elif server_position:
+	else:
 		target = server_position
 		
 	velocity = (target - body.position).normalized() * speed
 	if (target - body.position).length() > 5:
 		velocity = body.move_and_slide(velocity)
+

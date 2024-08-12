@@ -3,13 +3,15 @@ import enum
 
 
 class Action(enum.Enum):
-    Chat = enum.auto()
     Ok = enum.auto()
     Deny = enum.auto()
+    Disconnect = enum.auto()
     Login = enum.auto()
     Register = enum.auto()
+    Chat = enum.auto()
     ModelDelta = enum.auto()
     Target = enum.auto()
+
 
 class Packet:
     def __init__(self, action: Action, *payloads):
@@ -25,7 +27,7 @@ class Packet:
 
     def __bytes__(self) -> bytes:
         return str(self).encode('utf-8')
-    
+
 class OkPacket(Packet):
     def __init__(self):
         super().__init__(Action.Ok)
@@ -33,6 +35,10 @@ class OkPacket(Packet):
 class DenyPacket(Packet):
     def __init__(self, reason: str):
         super().__init__(Action.Deny, reason)
+
+class DisconnectPacket(Packet):
+    def __init__(self, actor_id: int):
+        super().__init__(Action.Disconnect, actor_id)
 
 class LoginPacket(Packet):
     def __init__(self, username: str, password: str):
@@ -53,6 +59,7 @@ class ModelDeltaPacket(Packet):
 class TargetPacket(Packet):
     def __init__(self, t_x: float, t_y: float):
         super().__init__(Action.Target, t_x, t_y)
+
 
 def from_json(json_str: str) -> Packet:
     obj_dict = json.loads(json_str)

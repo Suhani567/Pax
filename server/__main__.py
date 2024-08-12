@@ -1,4 +1,4 @@
-import manage
+import manage   # This must be at the top
 import sys
 import protocol
 from twisted.python import log
@@ -15,7 +15,7 @@ class GameFactory(WebSocketServerFactory):
         self.tickrate: int = 20
 
         tickloop = task.LoopingCall(self.tick)
-        tickloop.start(1 / self.tickrate)  # 20 times per second
+        tickloop.start(1 / self.tickrate)
 
     def tick(self):
         for p in self.players:

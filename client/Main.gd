@@ -4,6 +4,7 @@ extends Node
 const NetworkClient = preload("res://websockets_client.gd")
 const Packet = preload("res://packet.gd")
 const Chatbox = preload("res://Chatbox.tscn")
+const Actor = preload("res://Actor.tscn")
 
 onready var _network_client = NetworkClient.new()
 onready var _login_screen = get_node("Login")
@@ -12,6 +13,11 @@ var _chatbox = null
 var state: FuncRef
 
 var _username: String
+
+var _player_actor = null
+
+var _actors: Dictionary = {}
+
 
 func _ready():
 	_network_client.connect("connected", self, "_handle_client_connected")
@@ -25,8 +31,7 @@ func _ready():
 	_login_screen.connect("register", self, "_handle_register_button")
 	
 	state = null
-
-
+	
 
 
 func PLAY(p):
@@ -36,6 +41,41 @@ func PLAY(p):
 			var message: String = p.payloads[1]
 			_chatbox.add_message(username, message)
 			
+		"ModelData":
+			var model_data: Dictionary = p.payloads[0]
+			_update_models(model_data)
+			
+func _update_models(model_data: Dictionary):
+	"""
+	Runs a function with signature 
+	`_update_x(model_id: int, model_data: Dictionary)` where `x` is the name 
+	of a model (e.g. `_update_actor`).
+	"""
+	print("Received model data: " + JSON.print(model_data))
+	var model_id: int = model_data["id"]
+	var func_name: String = "_update_" + model_data["model_type"].to_lower()
+	var f: FuncRef = funcref(self, func_name)
+	f.call_func(model_id, model_data)
+	
+func _update_actor(model_id: int, model_data: Dictionary):
+	# If this is an existing actor, just update them
+	if model_id in _actors:
+		_actors[model_id].update(model_data)
+
+	# If this actor doesn't exist in the game yet, create them
+	else:
+		var new_actor
+		
+		if not _player_actor: 
+			_player_actor = Actor.instance().init(model_data)
+			_player_actor.is_player = true
+			new_actor = _player_actor
+		else:
+			new_actor = Actor.instance().init(model_data)
+		
+		_actors[model_id] = new_actor
+		add_child(new_actor)
+		
 func LOGIN(p):
 	match p.action:
 		"Ok":
@@ -97,3 +137,10 @@ func _handle_network_data(data: String):
 
 func _handle_network_error():
 	OS.alert("There was an error")
+
+func _input(event):
+	if _player_actor and event.is_action_released("click"):
+		var target = _player_actor.body.get_global_mouse_position()
+		_player_actor._player_target = target
+		var p: Packet = Packet.new("Target", [target.x, target.y])
+		_network_client.send_packet(p)

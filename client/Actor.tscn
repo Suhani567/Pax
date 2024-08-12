@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://icon.png" type="Texture" id=1]
+[ext_resource path="res://Actor.gd" type="Script" id=2]
+
+[node name="Actor" type="Node2D"]
+script = ExtResource( 2 )
+
+[node name="KinematicBody2D" type="KinematicBody2D" parent="."]
+
+[node name="Label" type="Label" parent="KinematicBody2D"]
+margin_right = 40.0
+margin_bottom = 14.0
+
+[node name="Sprite" type="Sprite" parent="KinematicBody2D"]
+texture = ExtResource( 1 )

@@ -1,0 +1,12 @@
+ea4bc82a6ad023ab7ee23ee620429895
+::res://::1723461142
+Chatbox.gd::GDScript::-1::1723461142::0::1::::<>Control<>::
+Chatbox.tscn::PackedScene::7403614785073464525::1723369193::0::1::::<><>::res://Chatbox.gd
+default_env.tres::Environment::-1::1723461142::0::1::::<><>::
+icon.png::CompressedTexture2D::800325481881390805::1723461142::1723461152::1::::<><>::
+Login.gd::GDScript::-1::1723461142::0::1::::<>Control<>::
+Login.tscn::PackedScene::-1::1723461142::0::1::::<><>::
+Main.gd::GDScript::-1::1723461142::0::1::::<>Node<>::
+main.tscn::PackedScene::5478346811689027573::1723369193::0::1::::<><>::res://Main.gd<>uid://ddqmpovjmo67b::::res://Chatbox.tscn
+packet.gd::GDScript::-1::1723461142::0::1::::<>Object<>::
+websockets_client.gd::GDScript::-1::1723461142::0::1::::<>Node<>::

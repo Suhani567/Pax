@@ -41,7 +41,7 @@ func PLAY(p):
 			var message: String = p.payloads[1]
 			_chatbox.add_message(username, message)
 			
-		"ModelData":
+		"ModelDelta":
 			var model_data: Dictionary = p.payloads[0]
 			_update_models(model_data)
 			
@@ -138,7 +138,7 @@ func _handle_network_data(data: String):
 func _handle_network_error():
 	OS.alert("There was an error")
 
-func _input(event):
+func _unhandled_input(event):
 	if _player_actor and event.is_action_released("click"):
 		var target = _player_actor.body.get_global_mouse_position()
 		_player_actor._player_target = target

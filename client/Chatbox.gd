@@ -12,6 +12,7 @@ func _ready():
 	input_field.connect("text_entered", self, "text_entered")
 	button.connect("pressed", self, "button_pressed")
 
+
 func _input(event: InputEvent):
 	if event is InputEventKey and event.pressed:
 		match event.scancode:
@@ -20,11 +21,13 @@ func _input(event: InputEvent):
 			KEY_ESCAPE:
 				input_field.release_focus()
 
-func button_pressed():
-	text_entered(input_field.text)
-	
-func add_message(username: String, text: String):
-	chat_log.bbcode_text += username + ' says: "' + text + '"\n'
+
+func add_message(username, text: String):
+	if username:
+		chat_log.bbcode_text += username + ' says: "' + text + '"\n'
+	else:
+		# Server message
+		chat_log.bbcode_text += "[color=yellow]" + text + "[/color]\n" 
 
 
 func text_entered(text: String):
@@ -33,3 +36,5 @@ func text_entered(text: String):
 
 		emit_signal("message_sent", text)
 
+func button_pressed():
+	text_entered(input_field.text)

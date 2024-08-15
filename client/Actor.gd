@@ -6,13 +6,12 @@ onready var sprite: Sprite = get_node("KinematicBody2D/Avatar")
 onready var animation_player: AnimationPlayer = get_node("KinematicBody2D/Avatar/AnimationPlayer")
 
 var server_position: Vector2
+var initialised_position: bool = false
 var actor_name: String
 var velocity: Vector2 = Vector2.ZERO
 
 var is_player: bool = false
 var _player_target: Vector2
-
-var initialised_position: bool = false
 
 var rubber_band_radius: float = 200
 
@@ -42,6 +41,7 @@ func update(new_model: Dictionary):
 			elif (body.position - server_position).length() > rubber_band_radius:
 				# Rubber band if body position too far away from server position
 				body.position = server_position
+				
 			
 		if ientity.has("entity"):
 			var entity = ientity["entity"]
@@ -51,19 +51,24 @@ func update(new_model: Dictionary):
 				if label:
 					label.text = actor_name
 
+<<<<<<< HEAD
 func _physics_process(_delta):
 	if not body:
 		return
 		
+=======
+func _physics_process(delta):	
+>>>>>>> 15dd0d581307c2f41d24c9b27295215d696c77ad
 	var target: Vector2
 	if is_player:
 		target = _player_target
-	elif server_position:
+	else:
 		target = server_position
 		
 	velocity = (target - body.position).normalized() * speed
 	if (target - body.position).length() > 5:
 		velocity = body.move_and_slide(velocity)
+<<<<<<< HEAD
 	else:
 	   velocity = Vector2.ZERO	
 	
@@ -82,3 +87,6 @@ func _process(_delta):
 		animation_player.play("walk_up")
 	else:
 		animation_player.play("walk_left")
+=======
+
+>>>>>>> 15dd0d581307c2f41d24c9b27295215d696c77ad

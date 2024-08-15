@@ -69,6 +69,27 @@ class GameServerProtocol(WebSocketServerProtocol):
             self._known_others.remove(sender)
             self.send_client(p)
 
+    def PLAY(self, sender: 'GameServerProtocol', p: packet.Packet):
+        if p.action == packet.Action.Chat:
+            if sender == self:
+                self.broadcast(p, exclude_self=True)
+            else:
+                self.send_client(p)
+        
+        elif p.action == packet.Action.ModelDelta:
+            self.send_client(p)
+            if sender not in self._known_others:
+                # Send our full model data to the new player
+                sender.onPacket(self, packet.ModelDeltaPacket(models.create_dict(self._actor)))
+                self._known_others.add(sender)
+                
+        elif p.action == packet.Action.Target:
+            self._player_target = p.payloads
+
+        elif p.action == packet.Action.Disconnect:
+            self._known_others.remove(sender)
+            self.send_client(p)
+
     def _update_position(self) -> bool:
         "Attempt to update the actor's position and return true only if the position was changed"
         if not self._player_target:

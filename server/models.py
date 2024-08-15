@@ -58,6 +58,9 @@ class Actor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     instanced_entity = models.OneToOneField(InstancedEntity, on_delete=models.CASCADE)
 <<<<<<< HEAD
+<<<<<<< HEAD
     avatar_id = models.IntegerField(default=0)
+=======
+>>>>>>> 15dd0d581307c2f41d24c9b27295215d696c77ad
 =======
 >>>>>>> 15dd0d581307c2f41d24c9b27295215d696c77ad

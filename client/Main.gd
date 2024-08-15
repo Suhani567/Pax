@@ -121,6 +121,7 @@ func send_chat(text: String):
 	_chatbox.add_message(_username, text)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 func _handle_login_button(username: String, password: String):
 	state = funcref(self, "LOGIN")
 	var p: Packet = Packet.new("Login", [username, password])
@@ -132,6 +133,8 @@ func _handle_register_button(username: String, password: String, avatar_id: int)
 	var p: Packet = Packet.new("Register", [username, password, avatar_id])
 	_network_client.send_packet(p)
 	
+=======
+>>>>>>> 15dd0d581307c2f41d24c9b27295215d696c77ad
 =======
 >>>>>>> 15dd0d581307c2f41d24c9b27295215d696c77ad
 func _handle_client_connected():

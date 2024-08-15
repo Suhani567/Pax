@@ -52,10 +52,14 @@ func update(new_model: Dictionary):
 					label.text = actor_name
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 func _physics_process(_delta):
 	if not body:
 		return
 		
+=======
+func _physics_process(delta):	
+>>>>>>> 15dd0d581307c2f41d24c9b27295215d696c77ad
 =======
 func _physics_process(delta):	
 >>>>>>> 15dd0d581307c2f41d24c9b27295215d696c77ad
@@ -68,6 +72,7 @@ func _physics_process(delta):
 	velocity = (target - body.position).normalized() * speed
 	if (target - body.position).length() > 5:
 		velocity = body.move_and_slide(velocity)
+<<<<<<< HEAD
 <<<<<<< HEAD
 	else:
 	   velocity = Vector2.ZERO	
@@ -87,6 +92,9 @@ func _process(_delta):
 		animation_player.play("walk_up")
 	else:
 		animation_player.play("walk_left")
+=======
+
+>>>>>>> 15dd0d581307c2f41d24c9b27295215d696c77ad
 =======
 
 >>>>>>> 15dd0d581307c2f41d24c9b27295215d696c77ad

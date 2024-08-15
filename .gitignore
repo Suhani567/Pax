@@ -1,8 +1,8 @@
-# Server-specific ignores
 server/__pycache__
 server/venv
-server/migrations
 server/db.sqlite3
+server/migrations
+server/certs
 
 # Godot-specific ignores
 client/.import/
@@ -15,4 +15,5 @@ client/*.translation
 # Mono-specific ignores
 client/.mono/
 client/data_*/
+
 client/HTML5/

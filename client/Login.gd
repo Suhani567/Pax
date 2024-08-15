@@ -12,22 +12,21 @@ onready var avatar_left: Button = get_node("CanvasLayer/Panel/VBoxContainer/HBox
 onready var avatar_ok: Button = get_node("CanvasLayer/Panel/VBoxContainer/HBoxContainer/Button_Ok")
 onready var avatar_right: Button = get_node("CanvasLayer/Panel/VBoxContainer/HBoxContainer/Button_Right")
 
-var avatar_id: int = 0
+var avatar_id = 0
 
 signal login(username, password)
 signal register(username, password)
 
-
 func _ready():
 	password_field.secret = true
 	avatar_panel.visible = false
-
+	
 	login_button.connect("pressed", self, "_login")
 	register_button.connect("pressed", self, "_choose_avatar")
-
-	avatar_right.connect("pressed", self, "_next_avatar")
+	
+	avatar_left.connect("pressed", self, "_next_avatar")
 	avatar_ok.connect("pressed", self, "_register")
-	avatar_left.connect("pressed", self, "_prev_avatar")
+	avatar_right.connect("pressed", self, "_prev_avatar")
 
 func _login():
 	emit_signal("login", username_field.text, password_field.text)

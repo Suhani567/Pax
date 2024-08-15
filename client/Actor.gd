@@ -22,8 +22,8 @@ func _ready():
 
 func update(new_model: Dictionary):
 	.update(new_model)
-	  
-	 # Set the correct sprite for the actor's avatar ID
+	
+	# Set the correct sprite for the actor's avatar ID
 	if new_model.has("avatar_id"):
 		sprite.set_region_rect(Rect2(368, new_model["avatar_id"] * 48, 64, 48))
 	
@@ -51,18 +51,7 @@ func update(new_model: Dictionary):
 				if label:
 					label.text = actor_name
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-func _physics_process(_delta):
-	if not body:
-		return
-		
-=======
 func _physics_process(delta):	
->>>>>>> 15dd0d581307c2f41d24c9b27295215d696c77ad
-=======
-func _physics_process(delta):	
->>>>>>> 15dd0d581307c2f41d24c9b27295215d696c77ad
 	var target: Vector2
 	if is_player:
 		target = _player_target
@@ -72,12 +61,10 @@ func _physics_process(delta):
 	velocity = (target - body.position).normalized() * speed
 	if (target - body.position).length() > 5:
 		velocity = body.move_and_slide(velocity)
-<<<<<<< HEAD
-<<<<<<< HEAD
 	else:
-	   velocity = Vector2.ZERO	
-	
-func _process(_delta):
+		velocity = Vector2.ZERO
+
+func _process(delta):
 	# Get the direction angle
 	var angle = velocity.angle()
 
@@ -92,9 +79,5 @@ func _process(_delta):
 		animation_player.play("walk_up")
 	else:
 		animation_player.play("walk_left")
-=======
 
->>>>>>> 15dd0d581307c2f41d24c9b27295215d696c77ad
-=======
 
->>>>>>> 15dd0d581307c2f41d24c9b27295215d696c77ad

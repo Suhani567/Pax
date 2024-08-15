@@ -14,10 +14,10 @@ tracks/0/keys = {
 "times": PoolRealArray( 0 ),
 "transitions": PoolRealArray( 1 ),
 "update": 0,
-"values": [ 9 ]
+"values": [ 0 ]
 }
 
-[sub_resource type="Animation" id=2]
+[sub_resource type="Animation" id=3]
 resource_name = "walk_down"
 length = 0.3
 loop = true
@@ -34,7 +34,7 @@ tracks/0/keys = {
 "values": [ 1, 5, 9 ]
 }
 
-[sub_resource type="Animation" id=3]
+[sub_resource type="Animation" id=2]
 resource_name = "walk_left"
 length = 0.3
 loop = true
@@ -90,14 +90,12 @@ scale = Vector2( 4, 4 )
 texture = ExtResource( 1 )
 hframes = 4
 vframes = 3
-frame = 9
 region_enabled = true
-region_rect = Rect2( 368, 0, 64, 50 )
-region_filter_clip = true
+region_rect = Rect2( 368, 0, 64, 48 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/RESET = SubResource( 1 )
-anims/walk_down = SubResource( 2 )
-anims/walk_left = SubResource( 3 )
+anims/walk_down = SubResource( 3 )
+anims/walk_left = SubResource( 2 )
 anims/walk_right = SubResource( 4 )
 anims/walk_up = SubResource( 5 )

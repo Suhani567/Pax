@@ -16,12 +16,12 @@ func _ready():
 	_client.connect("connection_error", self, "_closed")
 	_client.connect("connection_established", self, "_connected")
 	_client.connect("data_received", self, "_on_data")
-
+	_client.verify_ssl = false
 
 func connect_to_server(hostname: String, port: int) -> void:
 	# Connects to the server or emits an error signal.
 	# If connected, emits a connect signal.
-	var websocket_url = "ws://%s:%d" % [hostname, port]
+	var websocket_url = "wss://%s:%d" % [hostname, port]
 	var err = _client.connect_to_url(websocket_url)
 	if err:
 		print("Unable to connect")
@@ -49,8 +49,9 @@ func _on_data():
 	var data: String = _client.get_peer(1).get_packet().get_string_from_utf8()
 	print("Got data from server: ", data)
 	emit_signal("data", data)
-	
-func _process(_delta):
+
+
+func _process(delta):
 	_client.poll()
 
 

@@ -50,19 +50,19 @@ class GameServerProtocol(WebSocketServerProtocol):
                 self.send_client(packet.DenyPacket("Username or password incorrect"))
 
         elif p.action == packet.Action.Register:
-            username, password = p.payloads
+            username, password, avatar_id = p.payloads
             if models.User.objects.filter(username=username).exists():
-                self.send_client(packet.DenyPacket("This username is already taken"))
-            else:
-                user = models.User(username=username, password=password)
-                user.save()
-                player_entity = models.Entity(name=username)
-                player_entity.save()
-                player_ientity = models.InstancedEntity(entity=player_entity, x=0, y=0)
-                player_ientity.save()
-                player = models.Actor(instanced_entity=player_ientity, user=user)
-                player.save()
-                self.send_client(packet.OkPacket())
+              self.send_client(packet.DenyPacket("This username is already taken"))
+        else:
+            user = models.User(username=username, password=password)
+            user.save()
+            player_entity = models.Entity(name=username)
+            player_entity.save()
+            player_ientity = models.InstancedEntity(entity=player_entity, x=0, y=0)
+            player_ientity.save()
+            player = models.Actor(instanced_entity=player_ientity, user=user, avatar_id=avatar_id)
+            player.save()
+            self.send_client(packet.OkPacket())        
 
     def _update_position(self) -> bool:
         "Attempt to update the actor's position and return true only if the position was changed"
